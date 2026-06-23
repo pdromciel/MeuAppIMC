@@ -1,63 +1,51 @@
-import * as Device from 'expo-device';
-import { Platform, StyleSheet } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-
-import { AnimatedIcon } from '@/components/animated-icon';
-import { HintRow } from '@/components/hint-row';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { WebBadge } from '@/components/web-badge';
-import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
-
-function getDevMenuHint() {
-  if (Platform.OS === 'web') {
-    return <ThemedText type="small">use browser devtools</ThemedText>;
-  }
-  if (Device.isDevice) {
-    return (
-      <ThemedText type="small">
-        shake device or press <ThemedText type="code">m</ThemedText> in terminal
-      </ThemedText>
-    );
-  }
-  const shortcut = Platform.OS === 'android' ? 'cmd+m (or ctrl+m)' : 'cmd+d';
-  return (
-    <ThemedText type="small">
-      press <ThemedText type="code">{shortcut}</ThemedText>
-    </ThemedText>
-  );
-}
+import { StyleSheet, Text, View, TextInput, TouchableOpacity } from 'react-native';
+import { useState } from 'react';
 
 export default function HomeScreen() {
+  const [peso, setPeso] = useState('');
+  const [altura, setAltura] = useState('');
+  const [resultado, setResultado] = useState('');
+
+  const calcularIMC = () => {
+    const p = parseFloat(peso);
+    const a = parseFloat(altura);
+
+    if (!p || !a) {
+      setResultado('Preencha os campos');
+      return;
+    }
+
+    const imc = p / (a * a);
+
+    setResultado(`Seu IMC é ${imc.toFixed(2)}`);
+  };
+
   return (
-    <ThemedView style={styles.container}>
-      <SafeAreaView style={styles.safeArea}>
-        <ThemedView style={styles.heroSection}>
-          <AnimatedIcon />
-          <ThemedText type="title" style={styles.title}>
-            Welcome to&nbsp;Expo
-          </ThemedText>
-        </ThemedView>
+    <View style={styles.container}>
+      <Text style={styles.titulo}>Calculadora de IMC</Text>
 
-        <ThemedText type="code" style={styles.code}>
-          get started
-        </ThemedText>
+      <TextInput
+        style={styles.input}
+        placeholder="Peso (kg)"
+        keyboardType="numeric"
+        value={peso}
+        onChangeText={setPeso}
+      />
 
-        <ThemedView type="backgroundElement" style={styles.stepContainer}>
-          <HintRow
-            title="Try editing"
-            hint={<ThemedText type="code">src/app/index.tsx</ThemedText>}
-          />
-          <HintRow title="Dev tools" hint={getDevMenuHint()} />
-          <HintRow
-            title="Fresh start"
-            hint={<ThemedText type="code">npm run reset-project</ThemedText>}
-          />
-        </ThemedView>
+      <TextInput
+        style={styles.input}
+        placeholder="Altura (m)"
+        keyboardType="numeric"
+        value={altura}
+        onChangeText={setAltura}
+      />
 
-        {Platform.OS === 'web' && <WebBadge />}
-      </SafeAreaView>
-    </ThemedView>
+      <TouchableOpacity style={styles.botao} onPress={calcularIMC}>
+        <Text style={styles.textoBotao}>Calcular</Text>
+      </TouchableOpacity>
+
+      <Text style={styles.resultado}>{resultado}</Text>
+    </View>
   );
 }
 
@@ -65,34 +53,33 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
-    flexDirection: 'row',
+    padding: 20,
   },
-  safeArea: {
-    flex: 1,
-    paddingHorizontal: Spacing.four,
-    alignItems: 'center',
-    gap: Spacing.three,
-    paddingBottom: BottomTabInset + Spacing.three,
-    maxWidth: MaxContentWidth,
-  },
-  heroSection: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    flex: 1,
-    paddingHorizontal: Spacing.four,
-    gap: Spacing.four,
-  },
-  title: {
+  titulo: {
+    fontSize: 28,
+    fontWeight: 'bold',
     textAlign: 'center',
+    marginBottom: 30,
   },
-  code: {
-    textTransform: 'uppercase',
+  input: {
+    borderWidth: 1,
+    padding: 12,
+    marginBottom: 15,
+    borderRadius: 8,
   },
-  stepContainer: {
-    gap: Spacing.three,
-    alignSelf: 'stretch',
-    paddingHorizontal: Spacing.three,
-    paddingVertical: Spacing.four,
-    borderRadius: Spacing.four,
+  botao: {
+    backgroundColor: '#007AFF',
+    padding: 15,
+    borderRadius: 8,
+  },
+  textoBotao: {
+    color: '#fff',
+    textAlign: 'center',
+    fontWeight: 'bold',
+  },
+  resultado: {
+    textAlign: 'center',
+    marginTop: 20,
+    fontSize: 20,
   },
 });
